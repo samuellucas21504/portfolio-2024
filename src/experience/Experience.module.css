@@ -1,0 +1,24 @@
+.experience {
+    min-height: 100vh;
+
+    padding: var(--section-padding);
+    background-color: var(--black-500);
+}
+
+.experience > h1 {
+    font-family: var(--emphasis-font);
+    font-size: 12rem;
+    -webkit-text-stroke: 2.1rem var(--white-500);
+    color: var(--green-500);
+    text-transform: uppercase;
+    paint-order: stroke fill;
+}
+
+section > h1 {
+    font-size: 4rem;
+    font-weight: bold;
+}
+
+section > h2{
+
+}

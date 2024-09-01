@@ -1,0 +1,58 @@
+@font-face {
+  font-family: 'Gokan';
+  src:local('Gokan'), url(./assets/fonts/Gokan.otf) format('opentype');
+}
+
+@font-face {
+  font-family: 'Kodchasan';
+  src: local('Kochasan-bold'), url(./assets/fonts/Kodchasan/Kodchasan-Bold.ttf) format('ttf');
+  font-weight: bold;
+}
+
+@font-face {
+  font-family: 'Kodchasan';
+  src: local('Kodchasan-extralight'), url(./assets/fonts/Kodchasan/Kodchasan-Extralight.ttf) format('truetype');
+  font-weight: 200;
+}
+
+:root {
+  --white-500: #ecf4da;
+  --green-500: #097969;
+  --black-500: #0d1f2d;
+
+
+  --section-padding: 7.5% 5%;
+
+  --default-font: Kodchasan, Inter, Avenir, Helvetica, Arial, sans-serif;
+
+  --emphasis-font: 'Gokan', sans-serif;
+
+  font-family: var(--default-font);
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: var(--white-500);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+
+  margin: 0;
+  padding: 0;
+
+  user-select: none;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--green-500);
+}

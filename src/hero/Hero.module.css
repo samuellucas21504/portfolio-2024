@@ -1,0 +1,51 @@
+.hero {
+  position: relative;
+  min-height: 100vh;
+  background-color: var(--green-500);
+}
+
+.topBar, .rightBar, .leftBar {
+  position: absolute;
+  width: 0;
+  height: 0;
+  
+  transition: width 2.5s ease, height 2.5s ease, border 0.5s ease;
+}
+
+.barExpanded {
+  width: 30%;
+  height: 30%;
+}
+
+.topBar {
+  left: 50%;
+  transform: translateX(-50%);
+  top: 1rem;
+
+  border-top: 0.1rem solid var(--white-500);
+}
+
+.rightBar {
+  top: 50%;
+  transform: translateY(-50%);
+  right: 1rem;
+
+  border-right: 0.1rem solid var(--white-500);
+}
+
+.leftBar {
+  top: 50%;
+  transform: translateY(-50%);
+  left: 1rem;
+
+  border-left: 0.1rem solid var(--white-500);
+}
+
+.bottomRightCorner {
+  bottom: 1rem;
+  right: 1rem;
+
+  border-top: none;
+  border-left: none;
+}
+

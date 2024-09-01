@@ -1,0 +1,134 @@
+.animationWrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.pulse {
+  position: absolute;
+  width: 34rem;
+  height: 34rem;
+  border-radius: 50%;
+  background-color: var(--white-500);
+  opacity: 0.8;
+  z-index: -1;
+  animation: pulseEffect 4s infinite ease-in-out;
+}
+
+@keyframes pulseEffect {
+  0% {
+    transform: scale(1);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0.24;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+.circle {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background-color: var(--black-500);
+  transition: width 2.5s ease, height 2.5s ease, border 0.5s ease;
+
+  z-index: 3;
+}
+
+.grow {
+  width: 43.25rem;
+  height: 43.25rem;
+}
+
+.border {
+  border: 1.667rem solid var(--white-500);
+}
+
+.headerText, .text {
+  position: absolute;
+  color: var(--white-500);
+  text-transform: uppercase;
+}
+
+.headerText {
+  top: 2.5rem;
+  font-size: 3.2rem;
+}
+
+.text {
+  font-family: 'Gokan', sans-serif;
+  font-size: 22rem;
+  paint-order: stroke fill;
+  -webkit-text-stroke: var(--black-500);
+  -webkit-text-stroke-width: 2.1rem;
+  -webkit-text-stroke-color: solid;
+  z-index: 1001;
+}
+
+@media (max-width: 768px) {
+  .pulse {
+    width: 25rem;
+    height: 25rem;
+  }
+
+  .grow {
+    width: 24rem;
+    height: 24rem;
+  }
+
+  .border {
+    border: 0.833rem solid var(--white-500);
+  }
+
+  .headerText {
+    font-size: 2.2rem;
+  }
+
+  .text {
+    font-size: 12rem;
+    -webkit-text-stroke-width: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .pulse {
+    width: 14rem;
+    height: 14rem;
+  }
+
+  .grow {
+    width: 16rem;
+    height: 16rem;
+  }
+
+  .border {
+    border: 0.5rem solid var(--white-500);
+  }
+
+  .headerText {
+    top: 1.2rem;
+    font-size: 1.5rem;
+  }
+
+  .text {
+    font-size: 8rem;
+    -webkit-text-stroke-width: 0.7rem;
+  }
+}
