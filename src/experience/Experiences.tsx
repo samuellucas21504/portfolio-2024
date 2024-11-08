@@ -1,3 +1,5 @@
+import { useState } from "react";
+import Carousel from "../components/Carousel";
 import { Experience, IExperienceProps } from "./Experience";
 import styles from './Experience.module.css';
 
@@ -35,18 +37,26 @@ const roles: IExperienceProps[] = [
 ];
 
 export default function Experiences() {
+    const [currentIndex, setCurrentIndex] = useState(0);
+
     return (
         <div className={styles.experience}>
             <h1>My Experience</h1>
+            <Carousel
+                currentIndex={currentIndex}
+                handleCurrentIndexChange={setCurrentIndex}
+            >
             {
                 roles.map((role) => (
                 <Experience 
+                        key={role.company}
                         position={role.position}
                         company={role.company}
                         text={role.text}
                     />
                 ))
             }
+            </Carousel>
         </div>
     ) 
 }

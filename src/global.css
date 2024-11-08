@@ -5,14 +5,15 @@
 
 @font-face {
   font-family: 'Kodchasan';
-  src: local('Kochasan-bold'), url(./assets/fonts/Kodchasan/Kodchasan-Bold.ttf) format('ttf');
+  src: local('Kochasan-bold'), url(/assets/fonts/Kodchasan/Kodchasan-Bold.ttf) format('ttf');
   font-weight: bold;
 }
 
 @font-face {
   font-family: 'Kodchasan';
-  src: local('Kodchasan-extralight'), url(./assets/fonts/Kodchasan/Kodchasan-Extralight.ttf) format('truetype');
+  src: local('Kodchasan-extralight'), url(/assets/fonts/Kodchasan/Kodchasan-Extralight.ttf) format('ttf');
   font-weight: 200;
+  font-style: normal;
 }
 
 :root {

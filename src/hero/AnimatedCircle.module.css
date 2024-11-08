@@ -133,3 +133,7 @@
     -webkit-text-stroke-width: 0.7rem;
   }
 }
+
+.sizeZero {
+  opacity: 0;
+}

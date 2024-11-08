@@ -29,12 +29,10 @@ export const AnimatedCircle = () => {
         <div className={styles.animationWrapper}>
           {animationComplete && <div className={styles.pulse} />}
           <div className={`${circleClass} ${animationComplete && styles.border}`}>
-            {animationComplete && (
-              <>
-                <div className={styles.headerText}>My name is</div>
-                <div className={styles.text}>Samuel</div>
+          <>
+                <div className={`${!animationComplete && styles.sizeZero} ${styles.headerText}`}>My name is</div>
+                <div className={`${!animationComplete && styles.sizeZero} ${styles.text}`}>Samuel</div>
               </>
-            )}
           </div>
         </div>
     );
