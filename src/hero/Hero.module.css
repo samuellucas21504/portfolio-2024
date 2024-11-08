@@ -2,6 +2,7 @@
   position: relative;
   min-height: 100vh;
   background-color: var(--green-500);
+  transition: all ease-in 150ms;
 }
 
 .topBar, .rightBar, .leftBar {

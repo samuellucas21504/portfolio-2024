@@ -1,11 +1,14 @@
 .experience {
-    min-height: 100vh;
+    min-height: calc(100vh + 1px);
+    margin-top: -1px;
 
     padding: var(--section-padding);
     background-color: var(--black-500);
 }
 
 .experience > h1 {
+    margin-top: 1rem;
+
     font-family: var(--emphasis-font);
     font-size: 12rem;
     -webkit-text-stroke: 2.1rem var(--white-500);
@@ -14,11 +17,48 @@
     paint-order: stroke fill;
 }
 
-section > h1 {
+section {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+}
+
+section > header > h1 {
     font-size: 4rem;
     font-weight: bold;
 }
 
-section > h2{
+section > header > small {
+    font-size: 2.1875rem;
+    font-weight: 200;
+}
 
+section > h2 {
+    font-size: 3.125rem;
+    font-weight: 200;
+    line-height: 3.75rem;
+}
+
+@media (max-width: 768px) {
+    .experience > h1 {
+        font-size: 5.5rem;
+        text-align: center;
+    }
+
+    section {
+        margin-top: 3rem;
+    }
+    section > header > small {
+        font-size: 1.5rem;
+    }
+    
+    section > h2 {
+        font-size: 1.7rem;
+    }
+}
+
+@media (max-width: 480px) {
+    section {
+        text-align: center;
+    }
 }

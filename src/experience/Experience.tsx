@@ -1,13 +1,19 @@
-import styles from './Experience.module.css';
+export interface IExperienceProps {
+    position: string;
+    company: string;
+    text: string[];
+}
 
-export const Experience = () => {
+export const Experience = ({position, company, text}: IExperienceProps) => {
     return (
-        <div className={styles.experience}>
-            <h1>My Experience</h1>
-                <section>
-                    <h1>Fullstack Developer</h1>
-                    <h2>NoCartorio.com</h2>
-                </section>
-        </div>
+        <section>
+            <header>
+                <h1>{position}</h1>
+                <small>@ {company}</small>
+            </header>
+            <h2>
+                {text.map((line) => <p>{line}</p>)}
+            </h2>
+        </section>
     );
 }
