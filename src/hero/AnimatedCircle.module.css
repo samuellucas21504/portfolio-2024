@@ -108,7 +108,7 @@
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 550px) {
   .pulse {
     width: 14rem;
     height: 14rem;

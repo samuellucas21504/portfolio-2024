@@ -1,0 +1,51 @@
+.wrapper {
+    min-height: 20vh;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    background-color: var(--black-500);
+}
+
+.wrapper a {
+    color: var(--white-500);
+    text-decoration: none;
+
+    transition: color 100ms ease;
+}
+
+.wrapper a:hover {
+    color:var(--green-500); 
+    text-decoration:none; 
+    cursor:pointer;  
+}
+
+.textWrapper {
+    display: flex;
+    align-items: center;
+}
+
+.copyButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+    position: relative;
+    text-align: center;
+
+    margin-left: 2px;
+}
+
+.messageCopiedAlert {
+    position: absolute;
+    top: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--green-500);
+    color: var(--white-500);
+    padding: 5px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    padding: 8px;
+}
