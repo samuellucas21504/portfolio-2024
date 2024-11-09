@@ -41,13 +41,18 @@ section > h2 {
 
 @media (max-width: 768px) {
     .experience > h1 {
-        font-size: 5.5rem;
+        font-size: 6.5rem;
         text-align: center;
     }
 
     section {
         margin-top: 3rem;
     }
+
+    section > header > h1 {
+        font-size: 3rem;
+    }
+
     section > header > small {
         font-size: 1.5rem;
     }
@@ -58,7 +63,13 @@ section > h2 {
 }
 
 @media (max-width: 480px) {
+    .experience > h1 {
+        font-size: 5.5rem;
+        text-align: center;
+    }
+
     section {
         text-align: center;
     }
+
 }

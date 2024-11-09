@@ -1,4 +1,4 @@
-import React, { Dispatch, ReactNode, SetStateAction, useState } from "react";
+import React, { Dispatch, ReactNode, SetStateAction } from "react";
 
 import styles from "./Carousel.module.css";
 import { CaretLeft, CaretRight } from "@phosphor-icons/react";
