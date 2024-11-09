@@ -9,7 +9,7 @@ export const Experience = ({position, company, text}: IExperienceProps) => {
         <section>
             <header>
                 <h1>{position}</h1>
-                <small>@ {company}</small>
+                <small><b>@</b> {company}</small>
             </header>
             <h2>
                 {text.map((line) => <p key={line}>{line}</p>)}
