@@ -20,6 +20,7 @@ export default function ContactSection() {
             {
                 contacts.map((info) => (
                     <Contact 
+                        key={info.icon?.link ?? info.text}
                         icon={info.icon} 
                         text={info.text} 
                     />
