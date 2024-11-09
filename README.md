@@ -6,4 +6,4 @@ My portfolio, created in 2024, draws inspiration from bold design. The idea was 
 
 [PT]
 
-Meu portfólio, criado em 2024, inspira-se em um design arrojado. A ideia foi apresentar minhas informações de forma simples, mas personalizada, que reflete quem eu sou. Espero que goste de explorá-lo. Sinta-se à vontade para entrar em contato! :')
+Meu portfólio, criado em 2024, inspira-se no estilo de design bold. A ideia foi apresentar minhas informações de forma simples, mas personalizada, que reflete quem eu sou. Espero que goste de explorá-lo. Sinta-se à vontade para entrar em contato! :')
