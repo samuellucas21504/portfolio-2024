@@ -21,6 +21,7 @@ section {
     display: flex;
     flex-direction: column;
     gap: 2.5rem;
+    height: 100%;
 }
 
 section > header > h1 {
@@ -41,7 +42,8 @@ section > header > small > b {
 }
 
 section > h2 {
-    font-size: 3.125rem;
+    height: 80%;
+    font-size: 2.6rem;
     font-weight: 200;
     line-height: 3.75rem;
 }

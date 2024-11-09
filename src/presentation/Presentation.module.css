@@ -41,7 +41,7 @@
     -webkit-text-stroke: 2.1rem var(--green-500);
 }
 
-@media (max-width: 1300px) {
+@media (max-width: 1350px) {
     .content {
         font-size: 9rem;
     }
