@@ -21,7 +21,7 @@ Node 20.19+ ou 22+.
 
 ## Publicar / Deploy
 
-O workflow `.github/workflows/deploy.yml` roda a cada push na `main`: instala, gera o build e publica `./dist` na branch `gh-pages` (GitHub Pages). O build usa caminhos relativos, então funciona no domínio raiz, em subpasta (`usuario.github.io/repo/`) ou em domínio próprio.
+O workflow `.github/workflows/deploy.yml` roda a cada push na `main`: instala, gera o build e publica `./dist` na branch `gh-pages` (GitHub Pages). O domínio próprio (samuellucasrdg.com) vem do arquivo `public/CNAME`, que vai junto em todo build: sem ele o deploy apaga o domínio do GitHub Pages. O build usa caminhos relativos, então também funciona em subpasta (`usuario.github.io/repo/`).
 
 ## Onde mexer / Where to edit
 
