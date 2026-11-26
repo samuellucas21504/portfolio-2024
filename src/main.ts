@@ -100,17 +100,32 @@ function setupHeroFit(root: HTMLElement): void {
       lucas.style.fontSize = `${size2}px`
     }
 
-    const sr = stage.getBoundingClientRect()
-    const tr = title.getBoundingClientRect()
-    const lr = lucas.getBoundingClientRect()
-    const l2 = line2.getBoundingClientRect()
-    const spare = tr.top - sr.top
+    // Medidas de layout (offset*), que ignoram transformações. Antes usava getBoundingClientRect, que
+    // inclui a animação de entrada de "Lucas" (deslocado e em escala no primeiro ajuste) e a escala da
+    // capa encolhida pela rolagem: o espaço da gota saía diferente a cada ajuste (carregar, resize,
+    // barra do celular) e a gota mudava de tamanho ao voltar ao topo.
+    const within = (el: HTMLElement) => {
+      let x = 0
+      let y = 0
+      let node: HTMLElement | null = el
+      while (node && node !== stage) {
+        x += node.offsetLeft
+        y += node.offsetTop
+        node = node.offsetParent as HTMLElement | null
+      }
+      return { x, y }
+    }
+    const sw = stage.clientWidth
+    const sh = stage.clientHeight
+    const spare = within(title).y
     let box: { left: number; top: number; width: number; height: number }
-    if (spare > sr.height * 0.22) {
-      box = { left: sr.width * 0.28, top: 0, width: sr.width * 0.72, height: spare }
+    if (spare > sh * 0.22) {
+      box = { left: sw * 0.28, top: 0, width: sw * 0.72, height: spare }
     } else {
-      const left = lr.right - sr.left + sr.width * 0.02
-      box = { left, top: l2.top - sr.top, width: Math.max(sr.width - left, sr.width * 0.16), height: l2.height }
+      // tela deitada: a gota fica na ponta direita, ao lado de "Lucas" (o desenho já aprovado), e nunca
+      // encosta no nome se ele for largo
+      const left = Math.max(within(lucas).x + lucas.offsetWidth + sw * 0.02, sw * 0.873)
+      box = { left, top: within(line2).y, width: Math.max(sw - left, sw * 0.16), height: line2.offsetHeight }
     }
     Object.assign(anchor.style, {
       left: `${box.left}px`,
