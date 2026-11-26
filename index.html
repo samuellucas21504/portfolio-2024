@@ -14,8 +14,8 @@
     <meta property="og:title" content="Samuel Lucas, engenheiro de software full stack" />
     <meta property="og:description" content="Samuel Lucas é engenheiro de software full stack em Uberlândia (MG). Trabalha com PHP/Laravel, Vue 3 e TypeScript." />
     <meta property="og:locale" content="pt_BR" />
-    <script type="module" crossorigin src="./assets/main-CPkDSkAu.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/main-DP2r1FBw.css">
+    <script type="module" crossorigin src="./assets/main-CqQhyUA-.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/main-DtRlnFdB.css">
   </head>
   <body>
     
@@ -170,11 +170,7 @@
 </section>
 
 <section id="profile" class="sec wrap bt" aria-labelledby="profile-title">
-  <h2 id="profile-title" class="ph" data-rv>
-    <span class="f-s ph-1">Engenheiro de</span>
-    <span class="f-x ph-2">Software</span>
-    <span class="ph-3"><span class="f-s">full</span><span class="f-c ph-4">stack.</span></span>
-  </h2>
+  <h2 id="profile-title" class="ph" data-rv data-lens><span class="f-s ph-1">Engenheiro de</span><span class="f-x ph-2">Software</span><span class="ph-3"><span class="f-s">full</span><span class="f-c ph-4">stack.</span></span><span class="lx lx-xray" aria-hidden="true"><span class="f-s ph-1">Engenheiro de</span><span class="f-x ph-2">Software</span><span class="ph-3"><span class="f-s">full</span><span class="f-c ph-4">stack.</span></span></span></h2>
   <div class="pgrid">
     <aside class="ficha" data-rv aria-label="Ficha técnica">
       <div class="f-m ficha-h">Ficha técnica</div>
@@ -186,9 +182,17 @@
 
 <section id="journey" class="sec bt" aria-labelledby="journey-title">
   <h2 id="journey-title" class="sr">Trajetória</h2>
-  <div class="gwrap" aria-hidden="true"><span class="giant f-x" data-par="-0.4">Trajetória • Trajetória • Trajetória</span></div>
+  <!-- abertura do capítulo: com movimento, o palco fica parado e a página chega pela direita (setupTransitions) -->
+  <div class="hx">
+    <div class="hx-stage">
+      <div class="hx-panel" aria-hidden="true"></div>
+      <div class="hx-final wrap">
+        <span class="hx-word f-x" aria-hidden="true" data-lens>Trajetória<span class="lx lx-fill">Trajetória</span></span>
+        <p class="jdeck">Começou automatizando coleta de dados com Python, passou por banco e por emissão de documentos em escala. Hoje está num SaaS para cartórios.</p>
+      </div>
+    </div>
+  </div>
   <div class="wrap">
-    <p class="jdeck" data-rv>Começou automatizando coleta de dados com Python, passou por banco e por emissão de documentos em escala. Hoje está num SaaS para cartórios.</p>
     <div class="xlist">
       <div class="xitem open">
         <button class="xrow" type="button" aria-expanded="true" aria-controls="job-0">
@@ -246,8 +250,11 @@
   </div>
 </section>
 
-<section id="stack" class="sec wrap t-ink" aria-labelledby="stack-title">
-  <div class="sgrid">
+<section id="stack" class="sec t-ink" aria-labelledby="stack-title">
+  <!-- com movimento, a seção chega como uma caixa fechada e as portas abrem quando ela ocupa a tela -->
+  <div class="boxstage">
+  <div class="box" aria-hidden="true"><div class="door door-l"><span class="door-label"><span class="f-x">Caixa de</span><span class="f-s">ferramentas</span></span><i class="latch"></i></div><div class="door door-r"><span class="door-label"><span class="f-x">Caixa de</span><span class="f-s">ferramentas</span></span><i class="latch"></i></div></div>
+  <div class="sgrid wrap">
     <div class="sleft">
       <h2 id="stack-title" class="f-x h2s">Caixa de <span class="f-s">ferramentas</span></h2>
       <div class="tabs" role="group" aria-label="Categorias de ferramentas"><button type="button" class="tab on" aria-pressed="true" data-name="Backend"><span class="tn">01</span>Backend</button><button type="button" class="tab" aria-pressed="false" data-name="Front & mobile"><span class="tn">02</span>Front & mobile</button><button type="button" class="tab" aria-pressed="false" data-name="Dados & busca"><span class="tn">03</span>Dados & busca</button><button type="button" class="tab" aria-pressed="false" data-name="Infra"><span class="tn">04</span>Infra</button><button type="button" class="tab" aria-pressed="false" data-name="Qualidade"><span class="tn">05</span>Qualidade</button></div>
@@ -260,13 +267,12 @@
       <ul class="sr"><li>Backend: PHP · Laravel, Rust, C# · .NET, Python, Java, APIs REST, Microsserviços</li><li>Front & mobile: Vue 3, TypeScript, Inertia.js, Pinia, Tailwind, React, Flutter</li><li>Dados & busca: MySQL, MariaDB, SQL Server, Redis, Elasticsearch</li><li>Infra: Docker, AWS, OCI · S3, Horizon, Reverb, Jenkins, GitLab, Grafana</li><li>Qualidade: Pest, Vitest, DDD, Hexagonal, Claude Code</li></ul>
     </div>
   </div>
+  </div>
 </section>
 
 <section id="contact" class="sec wrap t-pop" aria-labelledby="contact-title">
-  <h2 id="contact-title" class="cbig" data-rv>
-    <span class="f-x cb-1">Vamos</span>
-    <span class="cb-2"><span class="f-s">conversar</span><span class="f-x outl" aria-hidden="true">(?)</span></span>
-  </h2>
+  <div class="sky" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <h2 id="contact-title" class="cbig" data-rv data-lens><span class="f-x cb-1">Vamos</span><span class="cb-2"><span class="f-s">conversar</span><span class="f-x outl" aria-hidden="true">(?)</span></span><span class="lx lx-win" aria-hidden="true"><span class="f-x cb-1">Vamos</span><span class="cb-2"><span class="f-s">conversar</span><span class="f-x outl" aria-hidden="true">(?)</span></span></span></h2>
   <div class="cgrid">
     <div class="cmail-wrap">
       <span class="f-m">Escreva para</span>
@@ -285,11 +291,12 @@
 
 <footer class="foot">
   <div class="frow wrap f-m"><span>© 2026 Samuel Lucas</span><span>Uberlândia, MG</span><a class="nl" href="#top">Voltar ao topo <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><path d="M12 20V4"/><path d="M5 11l7-7 7 7"/></svg></a></div>
-  <span class="fmark f-x wrap" aria-hidden="true">Samuel Lucas</span>
+  <span class="fmark f-x wrap" aria-hidden="true"><span class="fl">S</span><span class="fl">a</span><span class="fl">m</span><span class="fl">u</span><span class="fl">e</span><span class="fl">l</span> <span class="fl">L</span><span class="fl">u</span><span class="fl">c</span><span class="fl">a</span><span class="fl">s</span></span>
 </footer>
 
 </div>
 <div class="lens" aria-hidden="true"></div>
+<div class="lens-dot" aria-hidden="true"></div>
 
   </body>
 </html>
