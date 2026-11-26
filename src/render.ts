@@ -45,6 +45,9 @@ export function renderHead(c: Content): string {
 
 export function renderPage(c: Content): string {
   const { nav, hero, work: w, profile: p, journey: j, stack: s, contact: ct, footer: f } = c
+  // títulos que a lente revela com outro tratamento (a cópia fica por cima, recortada no círculo da lente)
+  const phTitle = `<span class="f-s ph-1">${p.title[0]}</span><span class="f-x ph-2">${p.title[1]}</span><span class="ph-3">${p.title[2] ? `<span class="f-s">${p.title[2]}</span>` : ''}<span class="f-c ph-4">${p.title[3]}</span></span>`
+  const cbTitle = `<span class="f-x cb-1">${ct.title[0]}</span><span class="cb-2"><span class="f-s">${ct.title[1]}</span><span class="f-x outl" aria-hidden="true">(?)</span></span>`
 
   return `
 <a class="skip" href="#content">${c.skip}</a>
@@ -198,11 +201,7 @@ export function renderPage(c: Content): string {
 </section>
 
 <section id="profile" class="sec wrap bt" aria-labelledby="profile-title">
-  <h2 id="profile-title" class="ph" data-rv>
-    <span class="f-s ph-1">${p.title[0]}</span>
-    <span class="f-x ph-2">${p.title[1]}</span>
-    <span class="ph-3">${p.title[2] ? `<span class="f-s">${p.title[2]}</span>` : ''}<span class="f-c ph-4">${p.title[3]}</span></span>
-  </h2>
+  <h2 id="profile-title" class="ph" data-rv data-lens>${phTitle}<span class="lx lx-xray" aria-hidden="true">${phTitle}</span></h2>
   <div class="pgrid">
     <aside class="ficha" data-rv aria-label="${p.factsTitle}">
       <div class="f-m ficha-h">${p.factsTitle}</div>
@@ -214,9 +213,17 @@ export function renderPage(c: Content): string {
 
 <section id="journey" class="sec bt" aria-labelledby="journey-title">
   <h2 id="journey-title" class="sr">${j.heading}</h2>
-  <div class="gwrap" aria-hidden="true"><span class="giant f-x" data-par="-0.4">${j.giant}</span></div>
+  <!-- abertura do capítulo: com movimento, o palco fica parado e a página chega pela direita (setupTransitions) -->
+  <div class="hx">
+    <div class="hx-stage">
+      <div class="hx-panel" aria-hidden="true"></div>
+      <div class="hx-final wrap">
+        <span class="hx-word f-x" aria-hidden="true" data-lens>${j.heading}<span class="lx lx-fill">${j.heading}</span></span>
+        <p class="jdeck">${j.deck}</p>
+      </div>
+    </div>
+  </div>
   <div class="wrap">
-    <p class="jdeck" data-rv>${j.deck}</p>
     <div class="xlist">${list(
       j.jobs,
       (job, i) => `
@@ -238,8 +245,14 @@ export function renderPage(c: Content): string {
   </div>
 </section>
 
-<section id="stack" class="sec wrap t-ink" aria-labelledby="stack-title">
-  <div class="sgrid">
+<section id="stack" class="sec t-ink" aria-labelledby="stack-title">
+  <!-- com movimento, a seção chega como uma caixa fechada e as portas abrem quando ela ocupa a tela -->
+  <div class="boxstage">
+  <div class="box" aria-hidden="true">${list(
+    ['l', 'r'],
+    (side) => `<div class="door door-${side}"><span class="door-label"><span class="f-x">${s.title[0]}</span><span class="f-s">${s.title[1]}</span></span><i class="latch"></i></div>`,
+  )}</div>
+  <div class="sgrid wrap">
     <div class="sleft">
       <h2 id="stack-title" class="f-x h2s">${s.title[0]} <span class="f-s">${s.title[1]}</span></h2>
       <div class="tabs" role="group" aria-label="${s.groupAria}">${list(
@@ -261,13 +274,12 @@ export function renderPage(c: Content): string {
       <ul class="sr">${list(s.cats, (cat) => `<li>${cat.name}: ${cat.words.join(', ')}</li>`)}</ul>
     </div>
   </div>
+  </div>
 </section>
 
 <section id="contact" class="sec wrap t-pop" aria-labelledby="contact-title">
-  <h2 id="contact-title" class="cbig" data-rv>
-    <span class="f-x cb-1">${ct.title[0]}</span>
-    <span class="cb-2"><span class="f-s">${ct.title[1]}</span><span class="f-x outl" aria-hidden="true">(?)</span></span>
-  </h2>
+  <div class="sky" aria-hidden="true">${'<i></i>'.repeat(12)}</div>
+  <h2 id="contact-title" class="cbig" data-rv data-lens>${cbTitle}<span class="lx lx-win" aria-hidden="true">${cbTitle}</span></h2>
   <div class="cgrid">
     <div class="cmail-wrap">
       <span class="f-m">${ct.mailLabel}</span>
@@ -286,10 +298,11 @@ export function renderPage(c: Content): string {
 
 <footer class="foot">
   <div class="frow wrap f-m"><span>${f.copy}</span><span>${f.place}</span><a class="nl" href="#top">${f.top} ${icon(UP)}</a></div>
-  <span class="fmark f-x wrap" aria-hidden="true">Samuel Lucas</span>
+  <span class="fmark f-x wrap" aria-hidden="true">${list(['Samuel', 'Lucas'], (word, w) => (w ? ' ' : '') + list([...word], (ch) => `<span class="fl">${ch}</span>`))}</span>
 </footer>
 
 </div>
 <div class="lens" aria-hidden="true"></div>
+<div class="lens-dot" aria-hidden="true"></div>
 `
 }

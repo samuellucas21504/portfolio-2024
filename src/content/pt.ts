@@ -114,7 +114,6 @@ export const pt = {
   },
   journey: {
     heading: 'Trajetória',
-    giant: 'Trajetória • Trajetória • Trajetória',
     deck: 'Começou automatizando coleta de dados com Python, passou por banco e por emissão de documentos em escala. Hoje está num SaaS para cartórios.',
     jobs: [
       {

@@ -53,7 +53,9 @@ main:focus { outline: none; }
    Layout comum
    ========================================================= */
 .wrap { padding-left: clamp(16px, 2.8cqw, 40px); padding-right: clamp(16px, 2.8cqw, 40px); }
-.sec { position: relative; padding-top: clamp(64px, 8cqw, 120px); padding-bottom: clamp(64px, 8cqw, 120px); }
+.sec { position: relative; min-height: 100vh; min-height: 100svh; padding-top: clamp(64px, 8cqw, 120px); padding-bottom: clamp(64px, 8cqw, 120px); }
+/* cada seção ocupa pelo menos uma tela; o conteúdo fica no meio dela */
+#profile, #journey, #stack, #contact { display: flex; flex-direction: column; justify-content: center; }
 .bt { border-top: 1.5px solid var(--ink); }
 .jdeck { margin: 0 0 clamp(32px, 4cqw, 60px); max-width: 52ch; font-size: 17px; line-height: 1.5; }
 .shead { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 20px 24px; align-items: end; margin-bottom: clamp(32px, 4cqw, 60px); }
@@ -179,6 +181,66 @@ main:focus { outline: none; }
 .intro-on .intro-track { height: 100vh; height: 100svh; }
 .intro-on main { position: relative; z-index: 2; margin-top: -100vh; margin-top: -100svh; }
 .intro-on #work { background: var(--paper); }
+
+/* =========================================================
+   Transições entre seções (ligadas à rolagem, cada uma diferente).
+   O JS liga .tx-on e escreve as variáveis/transformações.
+   ========================================================= */
+/* Trabalho → Perfil: o Trabalho fica parado e escurece; o Perfil sobe por cima como uma folha */
+.tx-on #work { z-index: 1; background: var(--paper); }
+.tx-on #profile { z-index: 2; background: var(--paper); border-radius: var(--lift, 0px) var(--lift, 0px) 0 0; } /* a sombra que escurece vem do JS */
+/* Perfil → Trajetória: rolagem lateral. O palco fica parado por algumas telas de rolagem; o Perfil
+   sai pela esquerda, a página nova entra pela direita e "TRAJETÓRIA" atravessa enorme até virar o título.
+   Altura do .hx, margem e altura do palco vêm do JS (dependem da tela). */
+.tx-on #journey { padding-top: 0; border-top: 0; }
+.tx-on .hx { position: relative; pointer-events: none; }
+.tx-on .hx-stage { position: sticky; top: 0; overflow: hidden; z-index: 3; pointer-events: none; }
+.tx-on .hx-panel { display: block; position: absolute; inset: 0; background: var(--paper); }
+.tx-on .hx-final { position: absolute; inset: 0; justify-content: center; padding-bottom: 0; }
+.tx-on .hx-final .jdeck { pointer-events: auto; opacity: 0; }
+/* sem will-change: com ele o navegador congela a imagem da palavra num tamanho e só estica,
+   e na volta (de pequena para grande) o texto ficava borrado */
+.tx-on .hx-word { color: color-mix(in srgb, var(--ink) calc(var(--fa, 0) * 100%), transparent); }
+/* a lista sobe por cima do fim do palco (margem negativa vem do JS), logo abaixo do parágrafo */
+.tx-on .hx + .wrap { position: relative; z-index: 4; }
+/* mais espaço depois da lista da Trajetória, antes da caixa chegar */
+.tx-on #journey { padding-bottom: max(clamp(64px, 8cqw, 120px), 24vh); }
+/* Trajetória → Stack: a seção chega como uma caixa fechada. Quando ela ocupa a tela, o palco fica
+   parado, as travas giram e as duas portas abrem em 3D pelas dobradiças de fora (altura vem do JS). */
+.box { display: none; }
+.tx-on #stack { display: block; padding-top: 0; padding-bottom: 0; }
+.tx-on .boxstage { position: sticky; top: 0; overflow: hidden; display: flex; flex-direction: column; justify-content: center; padding-top: clamp(64px, 8cqw, 120px); padding-bottom: clamp(64px, 8cqw, 120px); }
+.tx-on .box { display: flex; position: absolute; inset: 0; z-index: 5; perspective: 1200px; pointer-events: none; }
+.door { position: relative; flex: 1 1 50%; overflow: hidden; background: var(--ink); -webkit-backface-visibility: hidden; backface-visibility: hidden; }
+.door-l { transform-origin: 0 50%; box-shadow: inset -1px 0 0 rgba(0, 0, 0, .4); }
+.door-r { transform-origin: 100% 50%; box-shadow: inset 1px 0 0 rgba(255, 255, 255, .14); }
+/* painel em baixo relevo e sombra que escurece conforme a porta gira */
+.door::before { content: ''; position: absolute; inset: clamp(14px, 2cqw, 28px); border: 1.5px solid rgba(238, 231, 215, .22); border-radius: 12px; }
+.door-l::before { right: 0; border-right: 0; border-radius: 12px 0 0 12px; }
+.door-r::before { left: 0; border-left: 0; border-radius: 0 12px 12px 0; }
+.door::after { content: ''; position: absolute; inset: 0; background: #0b0d2a; opacity: var(--shade, 0); }
+/* o rótulo atravessa as duas portas: cada uma mostra a sua metade e ele se parte ao abrir */
+.door-label { position: absolute; top: 40%; width: 200%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: center; color: var(--on-ink); font-size: clamp(44px, 9cqw, 140px); line-height: .88; text-align: center; }
+.door-l .door-label { left: 0; }
+.door-r .door-label { right: 0; }
+.door-label .f-s { font-size: 1.15em; }
+/* travas laranja junto da emenda: giram antes das portas abrirem */
+.latch { position: absolute; top: 72%; width: clamp(10px, 1cqw, 14px); height: clamp(48px, 6cqw, 76px); margin-top: calc(clamp(48px, 6cqw, 76px) / -2); border-radius: 999px; background: var(--pop); box-shadow: 2px 2px 0 rgba(0, 0, 0, .3); }
+.door-l .latch { right: clamp(14px, 2cqw, 28px); }
+.door-r .latch { left: clamp(14px, 2cqw, 28px); }
+
+/* Stack → Contato: depois do fim da caixa de ferramentas o cobalto continua numa faixa no topo do
+   Contato, e dentro dela colunas laranja com topos de formas diferentes sobem até virar o fundo.
+   A faixa fica abaixo da caixa de ferramentas, então a animação não cobre nada dela. */
+.sky { display: none; }
+.tx-on #contact { padding-top: calc(65vh + clamp(64px, 8cqw, 120px)); padding-top: calc(65svh + clamp(64px, 8cqw, 120px)); }
+.tx-on .sky { display: flex; position: absolute; left: 0; right: 0; top: 0; height: 65vh; height: 65svh; overflow: hidden; pointer-events: none; background: var(--ink); }
+.sky i { flex: 1 1 0; height: 100%; margin-right: -2px; background: var(--pop); transform: translateY(101%); } /* sobreposição de 2px: sem fresta entre colunas */
+.sky i:nth-child(4n+1) { border-radius: 999px 999px 0 0; }
+.sky i:nth-child(4n+2) { clip-path: polygon(0 6%, 50% 0, 100% 6%, 100% 100%, 0 100%); }
+.sky i:nth-child(4n) { clip-path: polygon(0 0, 100% 5%, 100% 100%, 0 100%); }
+/* Contato → rodapé: as letras do nome se juntam */
+.fl { display: inline-block; }
 .selbox { position: absolute; left: 0; top: 0; width: 0; height: 0; opacity: 0; outline: 1.5px solid var(--pop); }
 .sb-h { position: absolute; width: 10px; height: 10px; background: var(--paper); border: 1.5px solid var(--pop); }
 .sb-h:nth-child(1) { left: -5px; top: -5px; }
@@ -313,8 +375,11 @@ main:focus { outline: none; }
 /* =========================================================
    Trajetória
    ========================================================= */
-.gwrap { overflow: hidden; margin: 0 0 clamp(20px, 3cqw, 44px); }
-.giant { display: inline-block; margin-left: -6cqw; white-space: nowrap; font-size: 15cqw; line-height: .86; color: transparent; -webkit-text-stroke: 2px var(--ink); will-change: transform; }
+/* título da Trajetória: a palavra em contorno, do tamanho da largura (o JS ajusta a fonte) */
+.hx-panel { display: none; }
+.hx-final { display: flex; flex-direction: column; align-items: flex-start; gap: clamp(24px, 3cqw, 44px); padding-bottom: clamp(32px, 4cqw, 60px); }
+.hx-final .jdeck { margin: 0; }
+.hx-word { position: relative; display: inline-block; white-space: nowrap; font-size: 12cqw; line-height: .86; color: transparent; -webkit-text-stroke: 2px var(--ink); transform-origin: 0 0; }
 .xitem { position: relative; border-top: 1.5px solid currentColor; transition: background .45s, color .45s; }
 .xitem:last-child { border-bottom: 1.5px solid currentColor; }
 .xitem.open { background: var(--pop); color: var(--on-pop); }
@@ -410,7 +475,8 @@ a.cl:hover { background: var(--char); color: var(--on-char); transform: translat
 .lens {
   position: fixed; left: 0; top: 0; z-index: 1000; width: 44px; height: 44px; margin: -22px 0 0 -22px;
   border-radius: 50%; pointer-events: none; opacity: 0; will-change: transform;
-  transition: opacity .35s, width .4s cubic-bezier(.16,1,.3,1), height .4s cubic-bezier(.16,1,.3,1), margin .4s cubic-bezier(.16,1,.3,1);
+  transition: opacity .35s, width .4s cubic-bezier(.16,1,.3,1), height .4s cubic-bezier(.16,1,.3,1), margin .4s cubic-bezier(.16,1,.3,1),
+    -webkit-backdrop-filter .25s, backdrop-filter .25s;
   -webkit-backdrop-filter: blur(2.5px) saturate(1.6) brightness(1.05);
   backdrop-filter: blur(2.5px) saturate(1.6) brightness(1.05);
   background: radial-gradient(circle at 32% 28%, rgba(255,255,255,.4), rgba(255,255,255,.05) 60%, rgba(255,255,255,0) 72%);
@@ -430,7 +496,47 @@ a.cl:hover { background: var(--char); color: var(--on-char); transform: translat
   background: radial-gradient(circle at 34% 30%, rgba(255,255,255,.32), rgba(255,255,255,0) 48%), var(--ink, #2433C4);
   box-shadow: 3px 3px 0 var(--pop-ink, #E0450C);
 }
-@media (hover: none) { .lens { display: none; } }
+/* sobre títulos com data-lens: a lente vira um anel e revela, só dentro do círculo, a cópia .lx */
+.lens.zone {
+  width: 76px; height: 76px; margin: -38px 0 0 -38px;
+  -webkit-backdrop-filter: none; backdrop-filter: none;
+  background: none; box-shadow: 0 0 0 1.5px var(--ink, #2433C4);
+}
+/* sobre texto: continua uma bolha de vidro, mas sem desfoque e com o centro limpo, então o texto
+   embaixo fica 100% nítido. O vidro aparece só na borda: brilho em cima, reflexo embaixo, aro e sombra.
+   (mesma lista de filtros do estado normal, para a troca ser um fade e não um salto) */
+.lens.txt {
+  -webkit-backdrop-filter: blur(0px) saturate(1.35) brightness(1);
+  backdrop-filter: blur(0px) saturate(1.35) brightness(1);
+  background: none;
+  box-shadow:
+    inset 4px 5px 7px -4px rgba(255, 255, 255, .9),
+    inset -3px -4px 7px -4px rgba(255, 255, 255, .45),
+    inset 0 0 0 1px rgba(255, 255, 255, .75),
+    0 6px 16px -8px rgba(0, 0, 0, .35);
+}
+/* a ponta real do cursor: segue o mouse sem atraso (a bola vai atrás, suavizada) */
+.lens-dot {
+  position: fixed; left: 0; top: 0; z-index: 1001; width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%;
+  background: var(--ink, #2433C4); box-shadow: 0 0 0 1.5px #EEE7D7; pointer-events: none; opacity: 0; transition: opacity .2s;
+}
+.lens-dot.on { opacity: 1; }
+/* com a bola ativa, o cursor do sistema some (só em mouse/caneta; o JS liga a classe) */
+.no-cursor, .no-cursor * { cursor: none !important; }
+@media (hover: none) { .lens, .lens-dot { display: none; } }
+
+/* cópias reveladas pela lente: sobra 48px em volta para o círculo não ser cortado na borda do título */
+[data-lens] { position: relative; }
+.lx { position: absolute; inset: -48px; padding: 48px; pointer-events: none; clip-path: circle(0px at -999px -999px); }
+/* Trajetória: a lente mostra o contrário da palavra. --fa é o preenchimento da palavra (1 = cheia,
+   enquanto atravessa; 0 = contorno, quando vira título); a cópia usa 1 - --fa e tem fundo aveia para
+   esconder o preenchimento original dentro do círculo. Cheia → só a borda; contorno → cheia. */
+.lx-fill { background: var(--paper); color: color-mix(in srgb, var(--ink) calc((1 - var(--fa, 0)) * 100%), transparent); }
+.lx-xray { background: var(--paper); }                            /* Perfil: o texto cheio vira só contorno */
+.lx-xray, .lx-xray * { color: transparent !important; -webkit-text-stroke: 1.5px var(--ink); }
+.lx-xray .ph-4 { -webkit-text-stroke-color: var(--pop-ink); }
+.lx-win { background: var(--ink); color: var(--paper); }          /* Contato: uma janela cobalto com texto aveia */
+.lx-win .outl { -webkit-text-stroke-color: var(--paper); }
 
 /* =========================================================
    Movimento reduzido
@@ -477,6 +583,7 @@ a.cl:hover { background: var(--char); color: var(--on-char); transform: translat
   .lang { padding: 0 10px; }
   /* três botões no celular: cada linha é preenchida por inteiro */
   .hbot .btn { flex: 1 1 auto; justify-content: center; }
+  .sky i:nth-child(n+7) { display: none; }
   .xrow { grid-template-columns: 28px minmax(0, 1fr) 40px; column-gap: 10px; }
   .xrow .xc { font-size: 5.8cqw; }
   .xi { width: 40px; height: 40px; }

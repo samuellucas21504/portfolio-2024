@@ -115,7 +115,6 @@ export const en: Content = {
   },
   journey: {
     heading: 'Journey',
-    giant: 'Journey • Journey • Journey • Journey',
     deck: 'Started out automating data collection with Python, then moved through banking and high-volume document generation. Now at a SaaS for notary offices.',
     jobs: [
       {

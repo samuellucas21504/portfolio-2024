@@ -373,9 +373,37 @@ function setupPointerFx(root: HTMLElement, motion: boolean): void {
   const dropEls = Array.from(root.querySelectorAll<SVGCircleElement>('.drop'))
   const letters = Array.from(root.querySelectorAll<HTMLElement>('.ln1 .lt'))
   const parallax = Array.from(root.querySelectorAll<HTMLElement>('[data-par]'))
+  // títulos com data-lens: a cópia .lx aparece só dentro do círculo da lente (meia letra fica meio pintada)
+  type Zone = { el: HTMLElement; lx: HTMLElement; clip: HTMLElement | null; shown: boolean }
+  const zones: Zone[] = []
+  for (const el of root.querySelectorAll<HTMLElement>('[data-lens]')) {
+    const lx = el.querySelector<HTMLElement>(':scope > .lx')
+    if (lx) zones.push({ el, lx, clip: el.closest<HTMLElement>('.hx-stage'), shown: false })
+  }
 
-  const mouse = { x: -9999, y: -9999, px: Number.NaN, py: Number.NaN, active: false, hot: false }
+  const mouse = { x: -9999, y: -9999, px: Number.NaN, py: Number.NaN, active: false, hot: false, text: false }
   let tap: { x: number; y: number } | null = null
+  // a ponta real do cursor: um ponto que anda junto com o mouse, sem a suavização da bola
+  const tip = document.querySelector<HTMLElement>('.lens-dot')
+  // com mouse ou caneta, só a bola aparece: o cursor do sistema some
+  if (lens && window.matchMedia('(hover: hover) and (pointer: fine)').matches) document.documentElement.classList.add('no-cursor')
+
+  // o ponteiro está em cima de caracteres? (as caixas do texto, não o bloco inteiro)
+  const range = document.createRange()
+  const overText = (target: Element | null, x: number, y: number) => {
+    if (!target) return false
+    for (const n of target.childNodes) {
+      if (n.nodeType !== Node.TEXT_NODE || !n.textContent?.trim()) continue
+      range.selectNodeContents(n)
+      // folga de 4px na vertical: o espaço entre linhas não faz a bola piscar entre vidro e nítido
+      for (const r of range.getClientRects()) if (x >= r.left - 2 && x <= r.right + 2 && y >= r.top - 4 && y <= r.bottom + 4) return true
+    }
+    return false
+  }
+  const readTarget = (target: Element | null) => {
+    mouse.hot = !!target?.closest('a, button')
+    mouse.text = overText(target, mouse.x, mouse.y)
+  }
 
   window.addEventListener(
     'pointermove',
@@ -387,7 +415,22 @@ function setupPointerFx(root: HTMLElement, motion: boolean): void {
       mouse.x = e.clientX
       mouse.y = e.clientY
       mouse.active = true
-      mouse.hot = e.target instanceof Element && !!e.target.closest('a, button')
+      readTarget(e.target instanceof Element ? e.target : null)
+      if (tip) tip.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`
+    },
+    { passive: true },
+  )
+  // rolando sem mexer o mouse, o que está embaixo dele muda: relê uma vez por quadro
+  let rereading = false
+  window.addEventListener(
+    'scroll',
+    () => {
+      if (!mouse.active || rereading) return
+      rereading = true
+      requestAnimationFrame(() => {
+        rereading = false
+        readTarget(document.elementFromPoint(mouse.x, mouse.y))
+      })
     },
     { passive: true },
   )
@@ -522,6 +565,44 @@ function setupPointerFx(root: HTMLElement, motion: boolean): void {
     })
   }
 
+  // recorta as cópias .lx no círculo da lente e escolhe o modo da lente.
+  // Roda no fim do quadro, depois do parallax, para o recorte acompanhar o texto que se mexe.
+  const finishLens = () => {
+    if (!lens) return
+    const r = lens.offsetWidth / 2
+    let inZone = false
+    for (const z of zones) {
+      let e: { left: number; right: number; top: number; bottom: number } = z.el.getBoundingClientRect()
+      if (z.clip) {
+        const c = z.clip.getBoundingClientRect()
+        e = { left: Math.max(e.left, c.left), right: Math.min(e.right, c.right), top: Math.max(e.top, c.top), bottom: Math.min(e.bottom, c.bottom) }
+      }
+      const hit = mouse.active && lensPos.x + r > e.left && lensPos.x - r < e.right && lensPos.y + r > e.top && lensPos.y - r < e.bottom
+      if (!hit) {
+        if (z.shown) {
+          z.lx.style.clipPath = ''
+          z.shown = false
+        }
+        continue
+      }
+      // coordenadas locais da cópia (se algum pai estiver em escala, divide pela escala)
+      const b = z.lx.getBoundingClientRect()
+      const s = b.width / (z.lx.offsetWidth || b.width) || 1
+      z.lx.style.clipPath = `circle(${fx1(r / s)}px at ${fx1((lensPos.x - b.left) / s)}px ${fx1((lensPos.y - b.top) / s)}px)`
+      z.shown = true
+      if (lensPos.x > e.left && lensPos.x < e.right && lensPos.y > e.top && lensPos.y < e.bottom) inZone = true
+    }
+    // sobre links encolhe; dentro da tinta vira gota de cobalto; nos títulos com efeito vira um anel
+    // que revela; sobre qualquer outro texto perde o vidro (fica só o anel, para o texto continuar legível)
+    const mode = mouse.hot ? ' hot' : inMain || inDot ? ' neg' : inZone ? ' zone' : mouse.text ? ' txt' : ''
+    const cls = 'lens' + (mouse.active ? ' on' + mode : '')
+    if (cls !== lensPos.cls) {
+      lens.className = cls
+      lensPos.cls = cls
+      tip?.classList.toggle('on', mouse.active)
+    }
+  }
+
   const frame = (t: number) => {
     requestAnimationFrame(frame)
     const steps = clamp(Math.round((t - last) / 16.7), 1, 3)
@@ -537,15 +618,11 @@ function setupPointerFx(root: HTMLElement, motion: boolean): void {
       lensPos.x += (mouse.x - lensPos.x) * (motion ? 0.2 : 1)
       lensPos.y += (mouse.y - lensPos.y) * (motion ? 0.2 : 1)
       lens.style.transform = `translate3d(${fx1(lensPos.x)}px, ${fx1(lensPos.y)}px, 0)`
-      // dentro da tinta a lente mostra o negativo do que está embaixo
-      const mode = mouse.hot ? ' hot' : inMain || inDot ? ' neg' : ''
-      const cls = 'lens' + (mouse.active ? ' on' + mode : '')
-      if (cls !== lensPos.cls) {
-        lens.className = cls
-        lensPos.cls = cls
-      }
     }
-    if (!motion) return
+    if (!motion) {
+      finishLens()
+      return
+    }
 
     const vh = window.innerHeight
     const g = geometry()
@@ -607,8 +684,205 @@ function setupPointerFx(root: HTMLElement, motion: boolean): void {
       const speed = Number(el.dataset.par ?? 0)
       el.style.transform = `translate3d(${((r.top + r.height / 2 - vh / 2) * speed) | 0}px, 0, 0)`
     }
+    finishLens()
   }
   requestAnimationFrame(frame)
+}
+
+/* ---------------------------------------------------------------
+   Transições entre as seções, ligadas à rolagem (voltam se rolar para cima).
+   Cada fronteira tem a sua, sem repetir:
+   Trabalho → Perfil: o Trabalho para e escurece, o Perfil sobe por cima como folha.
+   Perfil → Trajetória: rolagem lateral. A pessoa rola para baixo, mas o Perfil sai pela
+     esquerda, a página nova entra pela direita e "TRAJETÓRIA" atravessa a tela enorme até
+     virar o título da seção.
+   Trajetória → Stack: o cobalto se espalha como uma gota de tinta.
+   Stack → Contato: colunas laranja com topos de formas diferentes sobem.
+   Contato → rodapé: as letras do nome se juntam vindas de vários lados.
+   --------------------------------------------------------------- */
+
+// o título da Trajetória ocupa a largura toda (com ou sem movimento)
+function fitJourneyWord(root: HTMLElement): void {
+  const word = root.querySelector<HTMLElement>('.hx-word')
+  const box = root.querySelector<HTMLElement>('.hx-final')
+  if (!word || !box) return
+  const cs = getComputedStyle(box)
+  const avail = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight)
+  word.style.fontSize = '100px'
+  const w = word.offsetWidth
+  if (w > 0 && avail > 0) word.style.fontSize = `${((100 * avail * 0.99) / w).toFixed(2)}px`
+}
+
+function setupTransitions(root: HTMLElement): void {
+  const work = root.querySelector<HTMLElement>('#work')
+  const profile = root.querySelector<HTMLElement>('#profile')
+  const journey = root.querySelector<HTMLElement>('#journey')
+  const stack = root.querySelector<HTMLElement>('#stack')
+  const contact = root.querySelector<HTMLElement>('#contact')
+  const foot = root.querySelector<HTMLElement>('.foot')
+  const hx = root.querySelector<HTMLElement>('.hx')
+  const stage = root.querySelector<HTMLElement>('.hx-stage')
+  const panel = root.querySelector<HTMLElement>('.hx-panel')
+  const word = root.querySelector<HTMLElement>('.hx-word')
+  const deck = root.querySelector<HTMLElement>('.hx-final .jdeck')
+  if (!work || !profile || !journey || !stack || !contact || !foot || !hx || !stage || !panel || !word || !deck) return
+  const cols = Array.from(contact.querySelectorAll<HTMLElement>('.sky i'))
+  const letters = Array.from(foot.querySelectorAll<HTMLElement>('.fl'))
+  const listWrap = hx.nextElementSibling instanceof HTMLElement ? hx.nextElementSibling : null
+  const boxStage = stack.querySelector<HTMLElement>('.boxstage')
+  const box = stack.querySelector<HTMLElement>('.box')
+  const boxGrid = stack.querySelector<HTMLElement>('.sgrid')
+  const doors = Array.from(stack.querySelectorAll<HTMLElement>('.door'))
+  const latches = Array.from(stack.querySelectorAll<HTMLElement>('.latch'))
+  root.classList.add('tx-on')
+
+  // palco da Trajetória: fica parado por D px de rolagem. O .hx sobe uma tela (margem negativa) para
+  // o palco grudar no topo exatamente quando o fim do Perfil chega ao pé da tela.
+  const g = { D: 1, fx: 0, fy: 0, fw: 1, fh: 1, S: 1, DB: 1 }
+  const measure = () => {
+    const vh = window.innerHeight
+    // caixa de ferramentas: a seção fica uma tela mais DB de rolagem, e o palco gruda no topo nesse trecho
+    g.DB = Math.round(vh * 1.3)
+    if (boxStage && doors.length === 2) {
+      stack.style.height = `${vh + g.DB}px`
+      boxStage.style.height = `${vh}px`
+    }
+    fitJourneyWord(root)
+    g.D = Math.round(vh * 3)
+    hx.style.height = `${vh + g.D}px`
+    hx.style.marginTop = `${-vh}px`
+    stage.style.height = `${vh}px`
+    // lugar final da palavra (o título), medido sem transformação
+    g.fx = word.offsetLeft
+    g.fy = word.offsetTop
+    g.fw = word.offsetWidth
+    g.fh = word.offsetHeight
+    // enquanto atravessa, a palavra tem ~metade da altura da tela (limitada no celular para não correr demais)
+    g.S = clamp((vh * 0.5) / (g.fh * 0.84), 1.5, 5.5)
+    // a lista começa logo abaixo do parágrafo (no espaçamento normal), e não depois da tela inteira do palco:
+    // ela sobe por cima da parte vazia do palco enquanto o título pousa
+    if (listWrap) {
+      const gap = clamp(root.clientWidth * 0.04, 32, 60)
+      const below = vh - (deck.offsetTop + deck.offsetHeight) - gap
+      listWrap.style.marginTop = `${-Math.max(0, Math.round(below))}px`
+    }
+  }
+  measure()
+
+  const out3 = (k: number) => 1 - Math.pow(1 - k, 3)
+  const inOut = (k: number) => (k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2)
+  // ordem e desvios fixos (parecem aleatórios, mas não mudam entre visitas)
+  const colOrder = cols.map((_, i) => ((i * 7 + 3) % cols.length) / cols.length)
+  const scatter = letters.map((_, i) => ({ x: (((i * 37) % 11) - 5) * 0.22, y: 0.8 + ((i * 53) % 7) * 0.14, r: (((i * 29) % 9) - 4) * 8 }))
+
+  let queued = false
+  const render = () => {
+    queued = false
+    const vh = window.innerHeight
+    const W = root.clientWidth
+
+    // Trabalho → Perfil (p: topo do Perfil indo do pé ao topo da tela)
+    const p2 = clamp((vh - profile.getBoundingClientRect().top) / vh, 0, 1)
+    if (p2 > 0) {
+      work.style.transform = `translateY(${(p2 * vh).toFixed(1)}px) scale(${(1 - 0.07 * out3(p2)).toFixed(4)})`
+      work.style.transformOrigin = `50% ${Math.round(work.offsetHeight - vh / 2)}px`
+    } else {
+      work.style.transform = ''
+    }
+    profile.style.setProperty('--lift', `${(48 * (1 - out3(p2))).toFixed(1)}px`)
+    // escurecimento: uma sombra do tamanho do Perfil, deslocada uma tela para cima, cobre só a tela acima
+    // da folha (o Trabalho encolhido e as bordas que ele deixa à mostra) e nada abaixo
+    profile.style.boxShadow =
+      p2 > 0 && p2 < 1
+        ? `0 ${-vh}px 0 0 rgba(21, 21, 26, ${(0.62 * p2).toFixed(3)}), 0 -34px 60px -36px rgba(21, 21, 26, .55)`
+        : p2 >= 1
+          ? `0 ${-vh}px 0 0 rgba(21, 21, 26, .62)`
+          : ''
+
+    // Perfil → Trajetória: rolagem lateral com o palco parado
+    const scrolled = clamp(-hx.getBoundingClientRect().top, 0, g.D)
+    const q = scrolled / g.D
+    const a = inOut(clamp(q / 0.26, 0, 1)) // a página entra pela direita, o Perfil sai pela esquerda
+    const b = inOut(clamp((q - 0.26) / 0.52, 0, 1)) // a palavra atravessa a tela
+    const c = inOut(clamp((q - 0.78) / 0.22, 0, 1)) // a palavra encolhe até o lugar do título
+    // o Perfil fica parado na vertical (compensa a rolagem) enquanto sai para a esquerda
+    profile.style.transform = q > 0 ? `translate3d(${(-a * W).toFixed(1)}px, ${scrolled.toFixed(1)}px, 0)` : ''
+    panel.style.transform = `translate3d(${((1 - a) * W).toFixed(1)}px, 0, 0)`
+    const bw = g.fw * g.S
+    const bh = g.fh * g.S
+    const x0 = W * 0.06
+    const x1 = Math.min(x0, W - bw - W * 0.06)
+    let x = a < 1 ? x0 + (1 - a) * W : x0 + (x1 - x0) * b
+    let y = (vh - bh) / 2
+    let s = g.S
+    if (c > 0) {
+      x += (g.fx - x) * c
+      y += (g.fy - y) * c
+      s += (1 - s) * c
+    }
+    // transformação 2D (sem translate3d): o navegador redesenha o texto no tamanho atual em vez de esticar uma imagem
+    word.style.transform = `translate(${(x - g.fx).toFixed(1)}px, ${(y - g.fy).toFixed(1)}px) scale(${s.toFixed(4)})`
+    // cheia enquanto atravessa (para ler), vira contorno quando chega
+    word.style.setProperty('--fa', (1 - c).toFixed(3))
+    // o parágrafo só aparece no fim do pouso, quando a palavra já não passa por cima dele
+    const d = clamp((c - 0.6) / 0.4, 0, 1)
+    deck.style.opacity = d.toFixed(3)
+    deck.style.transform = d < 1 ? `translateY(${((1 - d) * 24).toFixed(1)}px)` : ''
+
+    // Trajetória → Stack: a caixa chega fechada; com ela ocupando a tela, as travas giram e as portas abrem
+    if (box && boxGrid) {
+      const ob = clamp(-stack.getBoundingClientRect().top / g.DB, 0, 1)
+      const unlatch = inOut(clamp(ob / 0.16, 0, 1))
+      const open = inOut(clamp((ob - 0.14) / 0.8, 0, 1))
+      for (const l of latches) l.style.transform = `rotate(${(unlatch * 90).toFixed(1)}deg)`
+      // as portas abrem para dentro: cada uma recua e, perto dos 90°, vira a parede lateral da caixa
+      // (abrir para fora fazia a porta passar pelo "olho" e sair da tela no meio do movimento)
+      const ang = open * 90
+      doors[0].style.transform = open > 0 ? `rotateY(${ang.toFixed(2)}deg)` : ''
+      doors[1].style.transform = open > 0 ? `rotateY(${(-ang).toFixed(2)}deg)` : ''
+      // escurece conforme vira (parede fica na sombra) e some no fim, deixando só as ferramentas
+      const shade = (Math.sin((ang * Math.PI) / 180) * 0.55).toFixed(3)
+      for (const d of doors) {
+        d.style.setProperty('--shade', shade)
+        d.style.opacity = (1 - clamp((open - 0.78) / 0.22, 0, 1)).toFixed(3)
+      }
+      box.style.visibility = open >= 1 ? 'hidden' : ''
+      // as ferramentas estavam lá dentro: chegam um pouco para frente enquanto as portas abrem
+      boxGrid.style.transform = open < 1 ? `scale(${(0.9 + 0.1 * open).toFixed(4)})` : ''
+      boxGrid.style.opacity = open < 1 ? (0.3 + 0.7 * open).toFixed(3) : ''
+    }
+
+    // Stack → Contato: as colunas sobem dentro da faixa cobalto no topo do Contato (abaixo da caixa de
+    // ferramentas), cada uma no seu tempo. Começa quando a faixa entra na tela e fecha quando ela está
+    // quase toda à vista (o pé da faixa a 85% da altura).
+    const p5 = clamp((vh - contact.getBoundingClientRect().top) / (vh * 0.8), 0, 1)
+    cols.forEach((c, i) => {
+      const k = out3(clamp(p5 * 1.7 - colOrder[i] * 0.7, 0, 1))
+      c.style.transform = `translateY(${((1 - k) * 101).toFixed(2)}%)`
+    })
+
+    // Contato → rodapé: o rodapé é curto, então a montagem acontece na rolagem que sobra até o fim
+    const fr = foot.getBoundingClientRect()
+    const p6 = clamp((vh - fr.top) / (fr.height || 1), 0, 1)
+    letters.forEach((l, i) => {
+      const k = out3(clamp(p6 * 1.5 - (i / letters.length) * 0.5, 0, 1))
+      const s = scatter[i]
+      l.style.transform = k >= 1 ? '' : `translate(${(s.x * (1 - k)).toFixed(3)}em, ${(s.y * (1 - k)).toFixed(3)}em) rotate(${(s.r * (1 - k)).toFixed(1)}deg)`
+    })
+  }
+  const schedule = () => {
+    if (queued) return
+    queued = true
+    requestAnimationFrame(render)
+  }
+  const remeasure = () => {
+    measure()
+    schedule()
+  }
+  window.addEventListener('scroll', schedule, { passive: true })
+  window.addEventListener('resize', remeasure)
+  document.fonts?.ready.then(remeasure)
+  render()
 }
 
 /* ---------------------------------------------------------------
@@ -711,6 +985,13 @@ if (site) {
   const motion = !window.matchMedia('(prefers-reduced-motion: reduce)').matches
   setupHeroFit(site)
   setupIntro(site, motion)
+  if (motion) setupTransitions(site)
+  else {
+    const fit = () => fitJourneyWord(site)
+    fit()
+    window.addEventListener('resize', fit)
+    document.fonts?.ready.then(fit)
+  }
   setupAccordion(site)
   setupStack(site, motion)
   if (motion) setupReveal(site)
